@@ -65,6 +65,7 @@ namespace VisionHandwritingICR
             this.panel7 = new System.Windows.Forms.Panel();
             this.panel14 = new System.Windows.Forms.Panel();
             this.ResultData = new System.Windows.Forms.DataGridView();
+            this.PREVIEWIMAGE = new System.Windows.Forms.PictureBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel3.SuspendLayout();
@@ -78,6 +79,7 @@ namespace VisionHandwritingICR
             this.ImagePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CurrentPhoto)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ResultData)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PREVIEWIMAGE)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -462,6 +464,16 @@ namespace VisionHandwritingICR
             this.ResultData.RowTemplate.Height = 25;
             this.ResultData.Size = new System.Drawing.Size(659, 519);
             this.ResultData.TabIndex = 11;
+            this.ResultData.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.ResultData_CellContentClick);
+            // 
+            // IMAGE_FUCK
+            // 
+            this.PREVIEWIMAGE.Location = new System.Drawing.Point(427, 12);
+            this.PREVIEWIMAGE.Name = "IMAGE_FUCK";
+            this.PREVIEWIMAGE.Size = new System.Drawing.Size(409, 587);
+            this.PREVIEWIMAGE.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.PREVIEWIMAGE.TabIndex = 17;
+            this.PREVIEWIMAGE.TabStop = false;
             // 
             // MainForm
             // 
@@ -471,6 +483,7 @@ namespace VisionHandwritingICR
             this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(953, 600);
+            this.Controls.Add(this.PREVIEWIMAGE);
             this.Controls.Add(this.ResultData);
             this.Controls.Add(this.panel14);
             this.Controls.Add(this.panel7);
@@ -498,6 +511,7 @@ namespace VisionHandwritingICR
             this.ImagePanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CurrentPhoto)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ResultData)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PREVIEWIMAGE)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -539,6 +553,7 @@ namespace VisionHandwritingICR
         private System.Windows.Forms.TextBox NameOfNewExcel;
         private System.Windows.Forms.PictureBox pictureBox4;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.PictureBox PREVIEWIMAGE;
     }
 }
 
