@@ -1,25 +1,19 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
-using Emgu.CV.OCR;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using Google.Cloud.Vision.V1;
 using OfficeOpenXml;
-using OfficeOpenXml.Style;
-using OpenCvSharp;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using VisionHandwritingICR.Processing;
 
 namespace VisionHandwritingICR
 {
@@ -35,25 +29,289 @@ namespace VisionHandwritingICR
             InitSomeAttributes();
             APIAuthorizePath.Text = @"‪C:\Vistark\securityKey.json";
             InitSheetParams();
-            //PREVIEWIMAGE.Hide();
         }
 
         private void Processing()
         {
             ResultDetectedStrings.Clear();
             ResultDetectedStrings = new List<string> {
-            "Cột 1",
-            "Cột 2",
-            "Cột 3",
-            "Data 1",
-            "Data 2",
-            "Data 3",
-            "Data 3",
-            "Data 3",
-            "Data 3",
-            "Data 3",
-            "Data 3",
-            "Data 3",
+            "STT",
+            "Mã Học viên",
+            "Họ tên",
+            "TH(20%)",
+            "BT/TL(40%)",
+            "Đ.Thi(40%)",
+            "ĐMH",
+            "Số Tờ",
+            "1",
+            "17ĐH030",
+            "Tạ Quốc Vương",
+            "7",
+            "8",
+            "5",
+            "6",
+            "1",
+                ////
+            "2",
+            "17ĐH029",
+            "Nguyễn Văn Vinh",
+            "6,5",
+            "7,5",
+            "2",
+            "9",
+            "2",
+                        ////
+            "3",
+            "17ĐH028",
+            "Phạm Đức Tùng",
+            "3",
+            "",
+            "",
+            "",
+            "1",
+                        ////
+            "4",
+            "17ĐH027",
+            "Nguyễn Minh Tùng",
+            "",
+            "5",
+            "",
+            "",
+            "1",
+                        ////
+            "5",
+            "17ĐH026",
+             "Huỳnh Phạm Trực",
+            "",
+            "",
+            "7",
+            "",
+            "1",
+                        ////
+            "6",
+            "17ĐH025",
+            "Trần Trung Thứ",
+            "",
+            "",
+            "",
+            "9",
+            "1",
+                        ////
+            "7",
+            "17ĐH024",
+            "Lê Sỹ Tấn",
+            "",
+            "",
+            "",
+            "",
+            "1",
+                        ////
+            "8",
+            "17ĐH023",
+            "Lê Hoàng Nhật Tân",
+            "",
+            "",
+            "",
+            "",
+            "",
+                        ////
+            "9",
+            "17ĐH022",
+            "Nguyễn Lâm Minh Nhật",
+            "",
+            "",
+            "",
+            "",
+            "",
+                        ////
+            "10",
+            "17ĐH021",
+            "Phạm Xuân Nguyên",
+            "",
+            "",
+            "",
+            "",
+            "",
+                        ////
+            "11",
+            "17ĐH020",
+            "Lê Văn Nam",
+            "",
+            "",
+            "",
+            "",
+            "",
+                        ////
+            "12",
+            "17ĐH019",
+            "Phan Thanh Lương",
+            "",
+            "",
+            "",
+            "",
+            "",
+                        ////
+            "13",
+            "17ĐH018",
+            "Trần Hữu Lực",
+            "",
+            "",
+            "",
+            "",
+            "",
+                        ////
+            "14",
+            "17ĐH017",
+            "Nguyễn Quang Huy",
+            "",
+            "",
+            "",
+            "",
+            "",
+                        ////
+            "15",
+            "17ĐH016",
+            "Nguyễn Ngọc Huy",
+            "",
+            "",
+            "",
+            "",
+            "",
+                        ////
+            "16",
+            "17ĐH015",
+            "Bùi Kỷ Huy",
+            "",
+            "",
+            "",
+            "",
+            "",
+                        ////
+            "17",
+            "17ĐH014",
+            "Cao Anh Hùng",
+            "",
+            "",
+            "",
+            "",
+            "",
+                         ////
+            "18",
+            "17ĐH013",
+            "Nguyễn Đức Hòa",
+            "",
+            "",
+            "",
+            "",
+            "",
+                         ////
+            "19",
+            "17ĐH012",
+            "Võ Minh Dương",
+            "",
+            "",
+            "",
+            "",
+            "",
+                         ////
+            "20",
+            "17ĐH011",
+            "Nguyễn Đạt Dũng",
+            "",
+            "",
+            "",
+            "",
+            "",
+                         ////
+            "21",
+            "17ĐH010",
+            "Nguyễn Văn Đỉnh",
+            "",
+            "",
+            "",
+            "",
+            "",
+                         ////
+            "22",
+            "17ĐH009",
+            "Hoàng Văn Đạt",
+            "",
+            "",
+            "",
+            "",
+            "",
+                         ////
+            "23",
+            "17ĐH008",
+            "Nguyễn Văn Cường",
+            "",
+            "",
+            "",
+            "",
+            "",
+                         ////
+            "24",
+            "17ĐH007",
+            "Nguyễn Văn Công",
+            "",
+            "",
+            "",
+            "",
+            "",
+                         ////
+            "25",
+            "17ĐH006",
+            "Vương Văn Chính",
+            "",
+            "",
+            "",
+            "",
+            "",
+                         ////
+            "26",
+            "17ĐH005",
+            "Phan Trọng Bình",
+            "",
+            "",
+            "",
+            "",
+            "",
+                         ////
+            "27",
+            "17ĐH004",
+            "Trần Đình Bá",
+            "",
+            "",
+            "",
+            "",
+            "",
+
+            "28",
+            "17ĐH003",
+            "Lương Nguyễn Tuấn Anh",
+            "",
+            "",
+            "",
+            "",
+            "",
+
+            "29",
+            "17ĐH002",
+            "Hoàng Ngọc Anh",
+            "",
+            "",
+            "",
+            "",
+            "",
+
+            "30",
+            "17ĐH001",
+            "Chu Văn An",
+            "",
+            "",
+            "",
+            "",
+            "",
             };
             return;
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", APIAuthorizePath.Text.ToString());
@@ -170,10 +428,14 @@ MessageBoxButtons.OK, MessageBoxIcon.Information);
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 CurrentImagePath = dlg.FileName;
-                //OpenProcessCropImage();
-                ProcessWithCv2(dlg.FileName);
+                OpenProcessCropImage();
+                var croppedImage = Pre.Processing(CurrentImagePath);
+                RemoveText.Processing(croppedImage);
+                CurrentPhoto.Image = croppedImage.ToBitmap();
             }
         }
+
+
 
         private void OpenProcessCropImage()
         {
@@ -202,6 +464,7 @@ MessageBoxButtons.OK, MessageBoxIcon.Information);
                 APIAuthorizePath.Text = dlg.FileName;
             }
         }
+
 
         private void ExportExcel_Click(object sender, EventArgs e)
         {
@@ -247,142 +510,6 @@ MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Process.Start(resPath);
             }
         }
-
-
-        /// <summary>
-        /// Bị gãy line khi detect
-        /// </summary>
-        /// <param name="imagePath"></param>
-        private void ProcessGetLineInImage(string imagePath)
-        {
-            var imgInput = new Image<Bgr, byte>(imagePath);
-            Image<Bgr, byte> res = imgInput.Copy();
-
-            var crrVar = res.Convert<Gray, byte>()
-                .ThresholdBinary(new Gray(125), new Gray(255));
-            LineSegment2D[] lines =
-                crrVar
-                .Canny(100, 100)
-                .HoughLinesBinary(1, Math.PI / 16, 1, 10, 1)[0];
-            foreach (LineSegment2D line in lines)
-            {
-                res.Draw(line, new Bgr(Color.Red), 2);
-            }
-            PREVIEWIMAGE.Image = res.ToBitmap();
-        }
-
-
-        private void ProcessWithCv2(string imgPath)
-        {
-            var inputImg = Cv2.ImRead(imgPath);
-            var binaryImg = inputImg.EmptyClone();
-            Cv2.Threshold(inputImg, binaryImg, 125, 255, ThresholdTypes.Binary);
-
-            var bmp1 = ByteToBitmap(binaryImg.ToBytes());
-            CurrentPhoto.Image = bmp1;
-            bmp1.Save(@"C:\Users\servi\Downloads\file_img_bina.jpg", ImageFormat.Jpeg);
-
-
-            var rawBina = new Image<Bgr, byte>(@"C:\Users\servi\Downloads\file_img_bina.jpg");
-            var processImg = rawBina.Convert<Gray, byte>();
-            // Lấy contour
-            Emgu.CV.Mat hierarchy = new Emgu.CV.Mat();
-            VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
-            CvInvoke.FindContours(processImg, contours, hierarchy, RetrType.List,
-                ChainApproxMethod.ChainApproxNone);
-
-            // Step 3 : contour fusion
-            List<System.Drawing.Point> points = new List<System.Drawing.Point>();
-            for (int i = 0; i < contours.Size; i++)
-            {
-                if (contours[i].ToArray().Any(x => x.X == 0 || x.Y == 0))
-                    continue;
-
-                points.AddRange(contours[i].ToArray());
-
-                var rect = CvInvoke.BoundingRectangle(contours[i]);
-                rawBina.Draw(rect, new Bgr(0, 255, 0), 1);
-
-                //CvInvoke.FillPoly(processImg, contours[i], new MCvScalar(0, 0, 255));
-                //rawBina.Draw(contours[i].ToArray(), new Bgr(0, 255, 0), 2);
-                //processImg.DrawPolyline(contours[i].ToArray(), true, new Bgr(0, 255, 0), 3);
-                //CvInvoke.Draw(processImg, contours[i], 0, new MCvScalar(255, 0, 0));
-            }
-
-
-
-            PREVIEWIMAGE.Image = rawBina.ToBitmap();
-            rawBina.ToBitmap().Save(@"C:\Users\servi\Downloads\file_img_prv.jpg", ImageFormat.Jpeg);
-        }
-
-
-        private Bitmap ByteToBitmap(byte[] content)
-        {
-            Bitmap bmp;
-            using var ms = new MemoryStream(content);
-            bmp = new Bitmap(ms);
-            return bmp;
-        }
-
-        /// <summary>
-        /// Vẫn không được
-        /// </summary>
-        /// <param name="imagePath"></param>
-        //private void ProcessRectangleInImage(string imagePath)
-        //{
-        //    var imgInput = new Image<Bgr, byte>(imagePath);
-        //    Image<Bgr, byte> res = imgInput.Copy();
-
-        //    var crrVar = res.Convert<Gray, byte>()
-        //        .ThresholdBinary(new Gray(100), new Gray(255));
-
-        //    CurrentPhoto.Image = crrVar.ToBitmap();
-        //    crrVar.ToBitmap().Save(@"C:\Users\servi\Downloads\file_img_bina.jpg", ImageFormat.Jpeg);
-
-        //    // Lấy contour 
-        //    Mat hierarchy = new Mat();
-        //    VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
-        //    CvInvoke.FindContours(crrVar, contours, hierarchy, RetrType.List,
-        //        ChainApproxMethod.ChainApproxNone);
-
-        //    //Step 3 : contour fusion
-        //    List<Point> points = new List<Point>();
-        //    for (int i = 0; i < contours.Size; i++)
-        //    {
-        //        if (contours[i].ToArray().Any(x => x.X == 0 || x.Y == 0))
-        //            continue;
-
-        //        points.AddRange(contours[i].ToArray());
-
-        //        //var rect = CvInvoke.BoundingRectangle(contours[i]);
-        //        //imgInput.Draw(rect, new Bgr(0, 255, 0), 1);
-
-        //        //CvInvoke.FillPoly(imgInput, contours[i], new MCvScalar(0, 0, 255));
-        //        imgInput.Draw(contours[i].ToArray(), new Bgr(0, 255, 0), 2);
-        //        //imgInput.DrawPolyline(contours[i].ToArray(), true, new Bgr(0, 255, 0), 3);
-        //        //CvInvoke.Draw(imgInput, contours[i], 0, new MCvScalar(255, 0, 0));
-        //    }
-
-        //    //Step 4 : Rotated rect
-        //    //RotatedRect minAreaRect = CvInvoke.MinAreaRect(points.Select(pt => new PointF(pt.X, pt.Y)).ToArray());
-        //    //Point[] vertices = minAreaRect.GetVertices().Select(pt => new Point((int)pt.X, (int)pt.Y)).ToArray();
-        //    ////Step 5 : draw result
-        //    //imgInput.Draw(vertices, new Bgr(Color.Red), 2);
-
-        //    PREVIEWIMAGE.Image = imgInput.ToBitmap();
-        //    imgInput.ToBitmap().Save(@"C:\Users\servi\Downloads\file_img.jpg", ImageFormat.Jpeg);
-
-        //    //CurrentPhoto.Image = crrVar.ToBitmap();
-        //    //// Math.PI / 16
-        //    //LineSegment2D[] lines =
-        //    //    crrVar
-        //    //    .HoughLinesBinary(0.02, Math.PI / 300, 10, 20, 2)[0];
-        //    //foreach (LineSegment2D line in lines)
-        //    //{
-        //    //    res.Draw(line, new Bgr(Color.Red), 2);
-        //    //}
-        //    //PREVIEWIMAGE.Image = res.ToBitmap();
-        //}
 
         private void ResultData_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {

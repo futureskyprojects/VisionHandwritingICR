@@ -65,7 +65,6 @@ namespace VisionHandwritingICR
             this.panel7 = new System.Windows.Forms.Panel();
             this.panel14 = new System.Windows.Forms.Panel();
             this.ResultData = new System.Windows.Forms.DataGridView();
-            this.PREVIEWIMAGE = new System.Windows.Forms.PictureBox();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.panel3.SuspendLayout();
@@ -79,7 +78,6 @@ namespace VisionHandwritingICR
             this.ImagePanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CurrentPhoto)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ResultData)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PREVIEWIMAGE)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -108,13 +106,13 @@ namespace VisionHandwritingICR
             // label1
             // 
             this.label1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label1.ForeColor = System.Drawing.Color.White;
             this.label1.Location = new System.Drawing.Point(0, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(953, 53);
             this.label1.TabIndex = 1;
-            this.label1.Text = "ỨNG DỤNG ĐỌC CHỮ VIẾT TAY - ICR";
+            this.label1.Text = "Phần mềm nhập điểm thành phần hỗ trợ công tác khảo thí";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // panel2
@@ -466,15 +464,6 @@ namespace VisionHandwritingICR
             this.ResultData.TabIndex = 11;
             this.ResultData.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.ResultData_CellContentClick);
             // 
-            // IMAGE_FUCK
-            // 
-            this.PREVIEWIMAGE.Location = new System.Drawing.Point(427, 12);
-            this.PREVIEWIMAGE.Name = "IMAGE_FUCK";
-            this.PREVIEWIMAGE.Size = new System.Drawing.Size(409, 587);
-            this.PREVIEWIMAGE.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.PREVIEWIMAGE.TabIndex = 17;
-            this.PREVIEWIMAGE.TabStop = false;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -483,7 +472,6 @@ namespace VisionHandwritingICR
             this.BackColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(953, 600);
-            this.Controls.Add(this.PREVIEWIMAGE);
             this.Controls.Add(this.ResultData);
             this.Controls.Add(this.panel14);
             this.Controls.Add(this.panel7);
@@ -495,7 +483,7 @@ namespace VisionHandwritingICR
             this.Controls.Add(this.panel1);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Ứng dụng đọc chữ viết tay - OCR";
+            this.Text = "Phần mềm nhập điểm thành phần hỗ trợ công tác khảo thí";
             this.panel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.panel3.ResumeLayout(false);
@@ -511,7 +499,6 @@ namespace VisionHandwritingICR
             this.ImagePanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CurrentPhoto)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ResultData)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PREVIEWIMAGE)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -553,7 +540,6 @@ namespace VisionHandwritingICR
         private System.Windows.Forms.TextBox NameOfNewExcel;
         private System.Windows.Forms.PictureBox pictureBox4;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.PictureBox PREVIEWIMAGE;
     }
 }
 
