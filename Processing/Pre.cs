@@ -98,7 +98,7 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu kết quả debug
-                imgBinarize.ToBitmap().Save(@"C:\Users\servi\Downloads\__#1_binary.jpg", ImageFormat.Jpeg);
+                imgBinarize.ToBitmap().CurrentSave("__#1_binary.jpg");
             }
             return imgBinarize;
         }
@@ -113,7 +113,7 @@ namespace VisionHandwritingICR.Processing
             var invertImage = binary.Not();
             if (IsDebug)
             {
-                invertImage.ToBitmap().Save(@"C:\Users\servi\Downloads\__#2_binary_invert.jpg", ImageFormat.Jpeg);
+                invertImage.ToBitmap().CurrentSave("__#2_binary_invert.jpg");
             }
             return invertImage;
         }
@@ -188,7 +188,7 @@ namespace VisionHandwritingICR.Processing
                     rawImageClone.Draw(rect, new Bgr(255, 0, 0), 5);
                 }
                 // Lưu ảnh viền bao đầy đủ
-                rawImageClone.ToBitmap().Save(@"C:\Users\servi\Downloads\__#4_full_contours.jpg", ImageFormat.Jpeg);
+                rawImageClone.ToBitmap().CurrentSave("__#4_full_contours.jpg");
             }
 
             // Lấy khung viền lớn nhất
@@ -206,11 +206,11 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu ảnh của khung viền đầy đủ
-                croppedImage.ToBitmap().Save(@"C:\Users\servi\Downloads\__#4_bigest_contours_in_binaInv.jpg", ImageFormat.Jpeg);
+                croppedImage.ToBitmap().CurrentSave("_#4_bigest_contours_in_binaInv.jpg");
                 // Lưu ảnh có màu đã được cắt
                 RawImage.ROI = bigestRect;
                 RawImage = RawImage.Copy();
-                RawImage.ToBitmap().Save(@"C:\Users\servi\Downloads\__#5_bigest_contours.jpg", ImageFormat.Jpeg);
+                RawImage.ToBitmap().CurrentSave("__#5_bigest_contours.jpg");
             }
 
             return croppedImage;

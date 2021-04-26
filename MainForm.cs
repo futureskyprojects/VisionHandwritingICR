@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
+using Emgu.CV.OCR;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using Google.Cloud.Vision.V1;
@@ -23,12 +24,16 @@ namespace VisionHandwritingICR
 
         private string CurrentImagePath = "";
 
+        private Image<Bgr, byte>[][] CurrentContentAreas;
+
         public MainForm()
         {
             InitializeComponent();
             InitSomeAttributes();
             APIAuthorizePath.Text = @"‪C:\Vistark\securityKey.json";
             InitSheetParams();
+
+            RuntimeController.SaveTesseractViModelToRuntimeDirectory();
         }
 
         private void Processing()
@@ -409,14 +414,49 @@ namespace VisionHandwritingICR
             ResultData.Rows.Clear();
             ResultData.Columns.Clear();
 
-            Processing();
+            //Processing();
+            ProcessingLocalData();
 
-            BuildListViewDataFromStringResult();
+            //BuildListViewDataFromStringResult();
 
             InitSheetParams();
 
             MessageBox.Show("Đã nhận diện xong", "THÀNH CÔNG",
 MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ProcessingLocalData()
+        {
+            DataTable dt = new DataTable();
+
+            var orc = new Tesseract(RuntimeController.GetTesseractViModelDirectory(), "vie", OcrEngineMode.TesseractLstmCombined);
+            for (int i = 0; i < CurrentContentAreas.Length; i++)
+            {
+                var dr = dt.NewRow();
+                for (int j = 0; j < CurrentContentAreas[i].Length; j++)
+                {
+                    var currentImg = CurrentContentAreas[i][j];
+                    orc.SetImage(currentImg);
+                    orc.Recognize();
+
+                    var res = orc.GetUTF8Text()
+                        .Trim();
+
+                    if (i == 0)
+                    {
+                        // Thêm header
+                        dt.Columns.Add(res);
+                    }
+                    else
+                    {
+                        dr[j] = res;
+                        // Thêm row
+                    }
+                }
+                dt.Rows.Add(dr);
+            }
+
+            ResultData.DataSource = dt;
         }
 
         private void CurrentPhoto_Click(object sender, EventArgs e)
@@ -430,7 +470,7 @@ MessageBoxButtons.OK, MessageBoxIcon.Information);
                 CurrentImagePath = dlg.FileName;
                 OpenProcessCropImage();
                 var croppedImage = Pre.Processing(CurrentImagePath);
-                RemoveText.Processing(croppedImage);
+                CurrentContentAreas = ExtractDataAreas.Processing(croppedImage);
                 CurrentPhoto.Image = croppedImage.ToBitmap();
             }
         }

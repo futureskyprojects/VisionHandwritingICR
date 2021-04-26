@@ -139,5 +139,15 @@ namespace VisionHandwritingICR.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] vie {
+            get {
+                object obj = ResourceManager.GetObject("vie", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

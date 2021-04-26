@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
+using Emgu.CV.OCR;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using System;
@@ -11,7 +12,7 @@ using System.Text;
 
 namespace VisionHandwritingICR.Processing
 {
-    public class RemoveText
+    public class ExtractDataAreas
     {
         public bool IsDebug { get; set; } = true;
 
@@ -19,14 +20,48 @@ namespace VisionHandwritingICR.Processing
         public Image<Bgr, byte> RawImage { get; set; }
 
         public int NumberOfColums { get; set; } = 9;
-        public static void Processing(Image<Bgr, byte> input, int numberOfColum = 9)
+        public static Image<Bgr, byte>[][] Processing(Image<Bgr, byte> input, int numberOfColum = 9)
         {
-            var removeText = new RemoveText();
+            var removeText = new ExtractDataAreas();
             removeText.NumberOfColums = numberOfColum;
-            removeText.ExtractKernel(input);
+            var contours = removeText.ExtractKernel(input);
+
+            var regions = removeText.SortContours(contours);
+            var bitmapDatas = new Image<Bgr, byte>[regions.Length][];
+
+            if (removeText.IsDebug)
+            {
+                RuntimeController.CleanFolder("CroppedCells");
+                RuntimeController.CleanFolder("CroppedCells_WithText");
+            }
+
+            var cloneInputImg = input.Clone();
+
+
+
+            for (int i = 0; i < regions.Length; i++)
+            {
+                bitmapDatas[i] = new Image<Bgr, byte>[regions[i].Length];
+                for (int j = 0; j < regions[i].Length; j++)
+                {
+                    var currentRectangle = regions[i][j];
+                    cloneInputImg.ROI = currentRectangle;
+
+                    var cropped = cloneInputImg.Copy();
+                    bitmapDatas[i][j] = cropped;
+
+                    if (removeText.IsDebug)
+                    {
+                        bitmapDatas[i][j].ToBitmap().CurrentSave($"Cell_({i},{j}).jpg", "CroppedCells");
+                    }
+                }
+            }
+
+
+            return bitmapDatas;
         }
 
-        public Image<Gray, byte> ExtractKernel(Image<Bgr, byte> input)
+        public VectorOfVectorOfPoint ExtractKernel(Image<Bgr, byte> input)
         {
             RawImage = input;
             var preProcess = new Pre();
@@ -35,13 +70,13 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu kết quả debug
-                step1BinaryImage.ToBitmap().Save(@"C:\Users\servi\Downloads\__#9_binary.jpg", ImageFormat.Jpeg);
+                step1BinaryImage.ToBitmap().CurrentSave("__#9_binary.jpg");
             }
             var step2BinaryInvertImage = preProcess.ConvertToInvertBinary(step1BinaryImage);
             if (IsDebug)
             {
                 // Lưu kết quả debug
-                step1BinaryImage.ToBitmap().Save(@"C:\Users\servi\Downloads\__#10_binary_inverted.jpg", ImageFormat.Jpeg);
+                step1BinaryImage.ToBitmap().CurrentSave("__#10_binary_inverted.jpg");
             }
 
             #region For vertical line
@@ -55,7 +90,7 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu kết quả debug
-                verticalLine.ToBitmap().Save(@"C:\Users\servi\Downloads\__#11_Vertical_line.jpg", ImageFormat.Jpeg);
+                verticalLine.ToBitmap().CurrentSave("__#11_Vertical_line.jpg");
             }
             #endregion
 
@@ -69,7 +104,7 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu kết quả debug
-                horizontalLine.ToBitmap().Save(@"C:\Users\servi\Downloads\__#12_Horizontai_line.jpg", ImageFormat.Jpeg);
+                horizontalLine.ToBitmap().CurrentSave("__#12_Horizontai_line.jpg");
             }
             #endregion
 
@@ -79,7 +114,7 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu kết quả debug
-                combinedLines.ToBitmap().Save(@"C:\Users\servi\Downloads\__#13_Combine_line.jpg", ImageFormat.Jpeg);
+                combinedLines.ToBitmap().CurrentSave("__#13_Combine_line.jpg");
             }
             #endregion
 
@@ -88,7 +123,7 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu kết quả debug
-                combinedLines.ToBitmap().Save(@"C:\Users\servi\Downloads\__#14_Combine_line_bitwise.jpg", ImageFormat.Jpeg);
+                combinedLines.ToBitmap().CurrentSave("__#14_Combine_line_bitwise.jpg");
             }
 
             var threshold = combinedLineBitwise.CopyBlank();
@@ -96,14 +131,12 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu kết quả debug
-                threshold.ToBitmap().Save(@"C:\Users\servi\Downloads\__#15_Combine_line_bitwise_threshold.jpg", ImageFormat.Jpeg);
+                threshold.ToBitmap().CurrentSave("__#15_Combine_line_bitwise_threshold.jpg");
             }
 
             var countours = preProcess.FindAllContours(threshold.Not());
 
-            SortContours(countours);
-
-            return verticalLine;
+            return countours;
         }
 
         public Image<Gray, byte> ExtractHoughLines(Image<Bgr, byte> input)
@@ -117,7 +150,7 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu kết quả debug
-                input.ToBitmap().Save(@"C:\Users\servi\Downloads\__#9_canny.jpg", ImageFormat.Jpeg);
+                input.ToBitmap().CurrentSave("__#9_canny.jpg");
             }
             var lines = edges.HoughLinesBinary(1, Math.PI / 30, 15, 50, 10);
 
@@ -141,13 +174,13 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu kết quả debug
-                input.ToBitmap().Save(@"C:\Users\servi\Downloads\__#10_binary.jpg", ImageFormat.Jpeg);
+                input.ToBitmap().CurrentSave("__#10_binary.jpg");
             }
 
             return edges;
         }
 
-        public void SortContours(VectorOfVectorOfPoint contours, string method = "LTR")
+        public Rectangle[][] SortContours(VectorOfVectorOfPoint contours, string method = "LTR")
         {
             // construct the list of bounding boxes and sort them from top to bottom
             var boudingBoxes = new List<Rectangle>();
@@ -180,7 +213,7 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu kết quả debug
-                imgClone.ToBitmap().Save(@"C:\Users\servi\Downloads\__#16_clean_contours_random_sort.jpg", ImageFormat.Jpeg);
+                imgClone.ToBitmap().CurrentSave("__#16_clean_contours_random_sort.jpg");
             }
 
             // Sắp xếp sơ bộ lại trật tự
@@ -219,10 +252,10 @@ namespace VisionHandwritingICR.Processing
                 }
 
                 // Lưu kết quả debug
-                imgClone2.ToBitmap().Save(@"C:\Users\servi\Downloads\__#17_clean_contours_sorted.jpg", ImageFormat.Jpeg);
+                imgClone2.ToBitmap().CurrentSave("__#17_clean_contours_sorted.jpg");
             }
 
-
+            return sortedBoudingBoxes;
         }
     }
 }
