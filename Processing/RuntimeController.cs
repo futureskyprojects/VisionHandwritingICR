@@ -57,6 +57,8 @@ namespace VisionHandwritingICR.Processing
 
         public static string GetExcelExportNewFileName(string prefixFileName = "KetQuaDiem")
         {
+            if (string.IsNullOrEmpty(prefixFileName)) prefixFileName = "KetQuaDiem";
+            prefixFileName = Path.GetFileNameWithoutExtension(prefixFileName);
             if (Regex.IsMatch(prefixFileName, @"KetQuaDiem_\d+"))
             {
                 prefixFileName = prefixFileName.Split("_")[0];
@@ -87,8 +89,20 @@ namespace VisionHandwritingICR.Processing
                     }
                 }
             }
-
-            return Path.Combine(currentPath, prefixFileName + ".xlsx");
+            latestIndex++;
+            var tempFileName = Path.Combine(currentPath, prefixFileName + ".xlsx");
+            if (latestIndex <= 0)
+            {
+                if (File.Exists(tempFileName))
+                {
+                    latestIndex++;
+                }
+            }
+            if (latestIndex <= 0)
+            {
+                return tempFileName;
+            }
+            return Path.Combine(currentPath, prefixFileName + "_" + latestIndex + ".xlsx");
         }
 
         public static string GetKeyDirectory()

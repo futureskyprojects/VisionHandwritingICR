@@ -48,7 +48,7 @@ namespace VisionHandwritingICR
 
         private void InitSheetParams()
         {
-            NameOfNewExcel.Text = RuntimeController.GetExcelExportNewFileName(NameOfNewExcel.Text);
+            NameOfNewExcel.Text = Path.GetFileNameWithoutExtension(RuntimeController.GetExcelExportNewFileName(NameOfNewExcel.Text));
             NameOfFirstSheet.Text = "Sheet1";
         }
 
@@ -324,12 +324,27 @@ namespace VisionHandwritingICR
                 return;
             }
 
+            if (File.Exists(RuntimeController.GetExcelExportNewFileName(NameOfNewExcel.Text)))
+            {
+                MessageBox.Show("Vui lòng đặt tên khác cho tệp excel xuất", "ĐÃ TỒN TẠI",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             var resPath = ExportExcelProcessing();
             var dlgRes = MessageBox.Show($"Đã xuất xong tại đường dẫn [{resPath}], mở thư mục chứa kết quả?", "THÀNH CÔNG",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+            InitSheetParams();
             if (dlgRes == DialogResult.Yes)
             {
-                Process.Start(resPath);
+                var folder = Path.GetDirectoryName(resPath);
+                //Process.Start(folder);
+                Process.Start(new ProcessStartInfo()
+                {
+                    FileName = folder,
+                    UseShellExecute = true,
+                    Verb = "open"
+                });
             }
         }
 
