@@ -32,6 +32,18 @@ namespace VisionHandwritingICR.Processing
 
         }
 
+        public static Image<Bgr, byte> Processing(Bitmap bmp)
+        {
+            var preProcess = new Pre();
+            preProcess.RawImage = bmp.ToImage<Bgr, byte>();
+            var step1BinaryImage = preProcess.ConvertToBinary(preProcess.RawImage);
+            var step2BinaryInvertImage = preProcess.ConvertToInvertBinary(step1BinaryImage);
+            var step3BigestContours = preProcess.GetBigestContours(step2BinaryInvertImage);
+            var step4 = preProcess.PerspectiveTransform(step3BigestContours);
+            return ReProcessing(step4);
+
+        }
+
         public static Image<Bgr, byte> ReProcessing(Image<Bgr, byte> inp)
         {
             var res = inp;
@@ -229,7 +241,7 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu ảnh của lọc nhiễu phong sương
-                bfImg.ToBitmap().Save(@"C:\Users\servi\Downloads\__#6_BilateralFilter.jpg", ImageFormat.Jpeg);
+                bfImg.ToBitmap().CurrentSave("__#6_BilateralFilter.jpg");
             }
 
             // Trích xuất góc
@@ -307,7 +319,7 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu ảnh của trích xuất góc
-                blackImage.ToBitmap().Save(@"C:\Users\servi\Downloads\__#7_CornerHarris_all_corners.jpg", ImageFormat.Jpeg);
+                blackImage.ToBitmap().CurrentSave("__#7_CornerHarris_all_corners.jpg");
             }
 
             // Điểm source
@@ -334,7 +346,7 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu ảnh của trích xuất góc
-                RawImage.ToBitmap().Save(@"C:\Users\servi\Downloads\__#8_WarpPerspective.jpg", ImageFormat.Jpeg);
+                RawImage.ToBitmap().CurrentSave("__#8_WarpPerspective.jpg");
             }
             RawImage.Draw(new Rectangle(new Point(0, 0), RawImage.Size), new Bgr(0, 0, 0), 2);
             return RawImage;

@@ -164,6 +164,7 @@ namespace VisionHandwritingICR
             // 
             this.NameOfFirstSheet.Location = new System.Drawing.Point(11, 159);
             this.NameOfFirstSheet.Name = "NameOfFirstSheet";
+            this.NameOfFirstSheet.PlaceholderText = "Tên của trang tính";
             this.NameOfFirstSheet.Size = new System.Drawing.Size(264, 23);
             this.NameOfFirstSheet.TabIndex = 16;
             // 
@@ -184,14 +185,15 @@ namespace VisionHandwritingICR
             this.adfadfa.ForeColor = System.Drawing.Color.Black;
             this.adfadfa.Location = new System.Drawing.Point(33, 137);
             this.adfadfa.Name = "adfadfa";
-            this.adfadfa.Size = new System.Drawing.Size(127, 19);
+            this.adfadfa.Size = new System.Drawing.Size(128, 19);
             this.adfadfa.TabIndex = 14;
-            this.adfadfa.Text = "Tên của sheet đầu";
+            this.adfadfa.Text = "Tên của trang tính";
             // 
             // NameOfNewExcel
             // 
             this.NameOfNewExcel.Location = new System.Drawing.Point(11, 111);
             this.NameOfNewExcel.Name = "NameOfNewExcel";
+            this.NameOfNewExcel.PlaceholderText = "Tên tệp excel sẽ lưu";
             this.NameOfNewExcel.Size = new System.Drawing.Size(264, 23);
             this.NameOfNewExcel.TabIndex = 13;
             // 
@@ -218,10 +220,15 @@ namespace VisionHandwritingICR
             // 
             // APIAuthorizePath
             // 
-            this.APIAuthorizePath.Location = new System.Drawing.Point(11, 62);
+            this.APIAuthorizePath.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.APIAuthorizePath.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.APIAuthorizePath.ForeColor = System.Drawing.SystemColors.Info;
+            this.APIAuthorizePath.Location = new System.Drawing.Point(11, 66);
             this.APIAuthorizePath.Name = "APIAuthorizePath";
-            this.APIAuthorizePath.Size = new System.Drawing.Size(264, 23);
+            this.APIAuthorizePath.PlaceholderText = "Nhấp để thay đổi";
+            this.APIAuthorizePath.Size = new System.Drawing.Size(264, 16);
             this.APIAuthorizePath.TabIndex = 10;
+            this.APIAuthorizePath.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.APIAuthorizePath.MouseClick += new System.Windows.Forms.MouseEventHandler(this.APIAuthorizePath_MouseClick);
             this.APIAuthorizePath.TextChanged += new System.EventHandler(this.APIAuthorizePath_TextChanged);
             // 
@@ -242,9 +249,9 @@ namespace VisionHandwritingICR
             this.label5.ForeColor = System.Drawing.Color.Black;
             this.label5.Location = new System.Drawing.Point(33, 41);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(187, 19);
+            this.label5.Size = new System.Drawing.Size(198, 19);
             this.label5.TabIndex = 8;
-            this.label5.Text = "Đường dẫn tệp chứng thực";
+            this.label5.Text = "Chọn tệp chứng thực (*.json)";
             // 
             // NumberOfColumn
             // 
@@ -263,7 +270,7 @@ namespace VisionHandwritingICR
             this.NumberOfColumn.Size = new System.Drawing.Size(71, 23);
             this.NumberOfColumn.TabIndex = 6;
             this.NumberOfColumn.Value = new decimal(new int[] {
-            3,
+            4,
             0,
             0,
             0});
@@ -285,9 +292,9 @@ namespace VisionHandwritingICR
             this.label4.ForeColor = System.Drawing.Color.Black;
             this.label4.Location = new System.Drawing.Point(33, 15);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(94, 19);
+            this.label4.Size = new System.Drawing.Size(127, 19);
             this.label4.TabIndex = 4;
-            this.label4.Text = "Số lượng cột";
+            this.label4.Text = "Số lượng cột scan";
             // 
             // StartDetectText
             // 

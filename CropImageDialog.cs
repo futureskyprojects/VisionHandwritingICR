@@ -19,9 +19,7 @@ namespace VisionHandwritingICR
         private float WRatio = 0F;
         private float HRatio = 0F;
 
-        private Rectangle _Rectangle;
-
-        private Rectangle BigRectagle;
+        private Rectangle Rectangle;
 
         Point StartLocation;
         Point EndLocation;
@@ -90,13 +88,13 @@ namespace VisionHandwritingICR
 
         private void ConfirmButton_Click(object sender, EventArgs e)
         {
-            if (_Rectangle != null)
+            if (Rectangle != null)
             {
                 var temp = new Rectangle();
-                temp.X = (int)(_Rectangle.X * WRatio);
-                temp.Y = (int)(_Rectangle.Y * HRatio);
-                temp.Width = (int)(_Rectangle.Width * WRatio);
-                temp.Height = (int)(_Rectangle.Height * HRatio);
+                temp.X = (int)(Rectangle.X * WRatio);
+                temp.Y = (int)(Rectangle.Y * HRatio);
+                temp.Width = (int)(Rectangle.Width * WRatio);
+                temp.Height = (int)(Rectangle.Height * HRatio);
 
                 CurrentImage.ROI = temp;
                 ProcessedBitmap = CurrentImage.ToBitmap();
@@ -123,7 +121,7 @@ namespace VisionHandwritingICR
 
         private void CurrentPicture_Paint(object sender, PaintEventArgs e)
         {
-            if (_Rectangle != null)
+            if (Rectangle != null)
             {
                 e.Graphics.DrawRectangle(Pens.Red, GetRectangle());
             }
@@ -131,14 +129,14 @@ namespace VisionHandwritingICR
 
         private Rectangle GetRectangle()
         {
-            _Rectangle = new Rectangle();
-            _Rectangle.X = Math.Min(StartLocation.X, EndLocation.X);
-            _Rectangle.Y = Math.Min(StartLocation.Y, EndLocation.Y);
-            _Rectangle.Width = Math.Abs(StartLocation.X - EndLocation.X);
-            _Rectangle.Height = Math.Abs(StartLocation.Y - EndLocation.Y);
+            Rectangle = new Rectangle();
+            Rectangle.X = Math.Min(StartLocation.X, EndLocation.X);
+            Rectangle.Y = Math.Min(StartLocation.Y, EndLocation.Y);
+            Rectangle.Width = Math.Abs(StartLocation.X - EndLocation.X);
+            Rectangle.Height = Math.Abs(StartLocation.Y - EndLocation.Y);
 
             LocationDisplay.Text = $"sXY: ({StartLocation.X},{StartLocation.Y}) - sY: ({EndLocation.X},{EndLocation.Y})";
-            return _Rectangle;
+            return Rectangle;
         }
 
         private void CurrentPicture_MouseUp(object sender, MouseEventArgs e)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using VisionHandwritingICR.Processing;
 
 namespace VisionHandwritingICR
 {
@@ -14,6 +15,9 @@ namespace VisionHandwritingICR
         [STAThread]
         static void Main()
         {
+            _ = RuntimeController.SaveTesseractViModelToRuntimeDirectory();
+            _ = RuntimeController.GetTableHeaderColumnsConfigs();
+
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

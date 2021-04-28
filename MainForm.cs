@@ -1,8 +1,6 @@
 ﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
 using Emgu.CV.OCR;
 using Emgu.CV.Structure;
-using Emgu.CV.Util;
 using Google.Cloud.Vision.V1;
 using OfficeOpenXml;
 using System;
@@ -13,6 +11,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using VisionHandwritingICR.Processing;
 
@@ -20,7 +21,6 @@ namespace VisionHandwritingICR
 {
     public partial class MainForm : Form
     {
-        private List<string> ResultDetectedStrings = new List<string>();
 
         private string CurrentImagePath = "";
 
@@ -30,361 +30,35 @@ namespace VisionHandwritingICR
         {
             InitializeComponent();
             InitSomeAttributes();
-            APIAuthorizePath.Text = @"‪C:\Vistark\securityKey.json";
-            InitSheetParams();
-
-            RuntimeController.SaveTesseractViModelToRuntimeDirectory();
-        }
-
-        private void Processing()
-        {
-            ResultDetectedStrings.Clear();
-            ResultDetectedStrings = new List<string> {
-            "STT",
-            "Mã Học viên",
-            "Họ tên",
-            "TH(20%)",
-            "BT/TL(40%)",
-            "Đ.Thi(40%)",
-            "ĐMH",
-            "Số Tờ",
-            "1",
-            "17ĐH030",
-            "Tạ Quốc Vương",
-            "7",
-            "8",
-            "5",
-            "6",
-            "1",
-                ////
-            "2",
-            "17ĐH029",
-            "Nguyễn Văn Vinh",
-            "6,5",
-            "7,5",
-            "2",
-            "9",
-            "2",
-                        ////
-            "3",
-            "17ĐH028",
-            "Phạm Đức Tùng",
-            "3",
-            "",
-            "",
-            "",
-            "1",
-                        ////
-            "4",
-            "17ĐH027",
-            "Nguyễn Minh Tùng",
-            "",
-            "5",
-            "",
-            "",
-            "1",
-                        ////
-            "5",
-            "17ĐH026",
-             "Huỳnh Phạm Trực",
-            "",
-            "",
-            "7",
-            "",
-            "1",
-                        ////
-            "6",
-            "17ĐH025",
-            "Trần Trung Thứ",
-            "",
-            "",
-            "",
-            "9",
-            "1",
-                        ////
-            "7",
-            "17ĐH024",
-            "Lê Sỹ Tấn",
-            "",
-            "",
-            "",
-            "",
-            "1",
-                        ////
-            "8",
-            "17ĐH023",
-            "Lê Hoàng Nhật Tân",
-            "",
-            "",
-            "",
-            "",
-            "",
-                        ////
-            "9",
-            "17ĐH022",
-            "Nguyễn Lâm Minh Nhật",
-            "",
-            "",
-            "",
-            "",
-            "",
-                        ////
-            "10",
-            "17ĐH021",
-            "Phạm Xuân Nguyên",
-            "",
-            "",
-            "",
-            "",
-            "",
-                        ////
-            "11",
-            "17ĐH020",
-            "Lê Văn Nam",
-            "",
-            "",
-            "",
-            "",
-            "",
-                        ////
-            "12",
-            "17ĐH019",
-            "Phan Thanh Lương",
-            "",
-            "",
-            "",
-            "",
-            "",
-                        ////
-            "13",
-            "17ĐH018",
-            "Trần Hữu Lực",
-            "",
-            "",
-            "",
-            "",
-            "",
-                        ////
-            "14",
-            "17ĐH017",
-            "Nguyễn Quang Huy",
-            "",
-            "",
-            "",
-            "",
-            "",
-                        ////
-            "15",
-            "17ĐH016",
-            "Nguyễn Ngọc Huy",
-            "",
-            "",
-            "",
-            "",
-            "",
-                        ////
-            "16",
-            "17ĐH015",
-            "Bùi Kỷ Huy",
-            "",
-            "",
-            "",
-            "",
-            "",
-                        ////
-            "17",
-            "17ĐH014",
-            "Cao Anh Hùng",
-            "",
-            "",
-            "",
-            "",
-            "",
-                         ////
-            "18",
-            "17ĐH013",
-            "Nguyễn Đức Hòa",
-            "",
-            "",
-            "",
-            "",
-            "",
-                         ////
-            "19",
-            "17ĐH012",
-            "Võ Minh Dương",
-            "",
-            "",
-            "",
-            "",
-            "",
-                         ////
-            "20",
-            "17ĐH011",
-            "Nguyễn Đạt Dũng",
-            "",
-            "",
-            "",
-            "",
-            "",
-                         ////
-            "21",
-            "17ĐH010",
-            "Nguyễn Văn Đỉnh",
-            "",
-            "",
-            "",
-            "",
-            "",
-                         ////
-            "22",
-            "17ĐH009",
-            "Hoàng Văn Đạt",
-            "",
-            "",
-            "",
-            "",
-            "",
-                         ////
-            "23",
-            "17ĐH008",
-            "Nguyễn Văn Cường",
-            "",
-            "",
-            "",
-            "",
-            "",
-                         ////
-            "24",
-            "17ĐH007",
-            "Nguyễn Văn Công",
-            "",
-            "",
-            "",
-            "",
-            "",
-                         ////
-            "25",
-            "17ĐH006",
-            "Vương Văn Chính",
-            "",
-            "",
-            "",
-            "",
-            "",
-                         ////
-            "26",
-            "17ĐH005",
-            "Phan Trọng Bình",
-            "",
-            "",
-            "",
-            "",
-            "",
-                         ////
-            "27",
-            "17ĐH004",
-            "Trần Đình Bá",
-            "",
-            "",
-            "",
-            "",
-            "",
-
-            "28",
-            "17ĐH003",
-            "Lương Nguyễn Tuấn Anh",
-            "",
-            "",
-            "",
-            "",
-            "",
-
-            "29",
-            "17ĐH002",
-            "Hoàng Ngọc Anh",
-            "",
-            "",
-            "",
-            "",
-            "",
-
-            "30",
-            "17ĐH001",
-            "Chu Văn An",
-            "",
-            "",
-            "",
-            "",
-            "",
-            };
-            return;
-            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", APIAuthorizePath.Text.ToString());
-            var client = ImageAnnotatorClient.Create();
-            var image = Google.Cloud.Vision.V1.Image.FromFile(CurrentImagePath);
-            var response = client.DetectText(image);
-            foreach (var annotation in response)
+            if (!File.Exists(RuntimeController.GetAPIKeyFilePath()))
             {
-                if (annotation.Description != null)
-                {
-                    ResultDetectedStrings.Add(annotation.Description);
-                }
+                APIAuthorizeFail();
             }
+            else
+            {
+                APIAuthorizeOK();
+            }
+            InitSheetParams();
         }
+
 
         private void InitSomeAttributes()
         {
         }
 
-        private void BuildListViewDataFromStringResult()
-        {
-            DataTable dt = new DataTable();
-
-            var columnCount = (int)NumberOfColumn.Value;
-            // Phân giải tên cột
-            for (int i = 0; i < columnCount; i++)
-                dt.Columns.Add(ResultDetectedStrings[i]);
-
-            // Phân giải nội dung các cột
-            var rowCount = (int)Math.Ceiling((((float)ResultDetectedStrings.Count - columnCount) / columnCount));
-            for (int i = 0; i < rowCount; i++)
-            {
-                var dr = dt.NewRow();
-                for (int j = 0; j < columnCount; j++)
-                {
-                    var currentIndex = (i + 1) * columnCount + j;
-                    if (currentIndex < ResultDetectedStrings.Count)
-                    {
-                        string currentValue = ResultDetectedStrings[currentIndex];
-                        dr[j] = currentValue;
-                    }
-                }
-                dt.Rows.Add(dr);
-            }
-            ResultData.DataSource = dt;
-        }
-
         private void InitSheetParams()
         {
-            NameOfNewExcel.Text = $"Table_{Guid.NewGuid()}";
+            NameOfNewExcel.Text = RuntimeController.GetExcelExportNewFileName(NameOfNewExcel.Text);
             NameOfFirstSheet.Text = "Sheet1";
         }
 
         private string ExportExcelProcessing()
         {
-            var currentAppPath = Path.GetDirectoryName(Application.ExecutablePath);
-            currentAppPath = Path.Combine(currentAppPath, "Exports");
+            var currentFileInfo = new FileInfo(RuntimeController.GetExcelExportNewFileName(NameOfNewExcel.Text));
 
-            if (!Directory.Exists(currentAppPath))
-            {
-                Directory.CreateDirectory(currentAppPath);
-            }
-
-            currentAppPath = Path.Combine(currentAppPath, NameOfNewExcel.Text + ".xlsx");
-
-            var currentFileInfo = new FileInfo(currentAppPath);
-
+            ExcelPackage.LicenseContext = LicenseContext.Commercial;
             using ExcelPackage pck = new ExcelPackage(currentFileInfo);
+
 
             DataTable table = (DataTable)ResultData.DataSource;
             DataTable filtered = table.DefaultView.ToTable();
@@ -405,58 +79,147 @@ namespace VisionHandwritingICR
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            if (string.IsNullOrEmpty(APIAuthorizePath.Text.ToString()))
+
+            if (!File.Exists(RuntimeController.GetAPIKeyFilePath()))
             {
-                MessageBox.Show("Vui lòng cung cấp tệp *.json chứng thực", "CHƯA CHỨNG THỰC",
+                MessageBox.Show("Vui lòng cung cấp tệp *.json chứng thực để sử dụng phần mềm", "CHƯA CHỨNG THỰC",
+                   MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+
+            if (NumberOfColumn.Value <= 0)
+            {
+                MessageBox.Show("Só cột quét cần lớn hơn 0", "DỮ LIỆU KHÔNG HỢP LỆ",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            ResultData.Rows.Clear();
-            ResultData.Columns.Clear();
 
-            //Processing();
-            ProcessingLocalData();
-
-            //BuildListViewDataFromStringResult();
+            ProcessingData();
 
             InitSheetParams();
 
-            MessageBox.Show("Đã nhận diện xong", "THÀNH CÔNG",
-MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Đã nhận diện xong", "THÀNH CÔNG", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void ProcessingLocalData()
+        private void ProcessingData()
         {
-            DataTable dt = new DataTable();
+            var client = ImageAnnotatorClient.Create();
 
-            var orc = new Tesseract(RuntimeController.GetTesseractViModelDirectory(), "vie", OcrEngineMode.TesseractLstmCombined);
-            for (int i = 0; i < CurrentContentAreas.Length; i++)
+            var loadingDialog = new LoadingForm();
+            new Thread(async () =>
             {
-                var dr = dt.NewRow();
-                for (int j = 0; j < CurrentContentAreas[i].Length; j++)
+                var scanColumnCount = NumberOfColumn.Value;
+                DataTable dt = new DataTable();
+
+                var cols = await RuntimeController.GetHeaderColumns();
+                // Khởi tạo danh sách cột
+                foreach (var col in cols)
                 {
-                    var currentImg = CurrentContentAreas[i][j];
-                    orc.SetImage(currentImg);
-                    orc.Recognize();
-
-                    var res = orc.GetUTF8Text()
-                        .Trim();
-
-                    if (i == 0)
-                    {
-                        // Thêm header
-                        dt.Columns.Add(res);
-                    }
-                    else
-                    {
-                        dr[j] = res;
-                        // Thêm row
-                    }
+                    dt.Columns.Add(col);
                 }
-                dt.Rows.Add(dr);
-            }
 
-            ResultData.DataSource = dt;
+
+                var orc = new Tesseract(RuntimeController.GetTesseractViModelDirectory(), "vie", OcrEngineMode.TesseractLstmCombined);
+                var number = new Tesseract(RuntimeController.GetTesseractViModelDirectory(), "vie", OcrEngineMode.TesseractOnly, "1234567890.,");
+                for (int i = 1; i < CurrentContentAreas.Length; i++)
+                {
+                    var dr = dt.NewRow();
+                    for (int j = 0; j < CurrentContentAreas[i].Length; j++)
+                    {
+                        var currentImg = CurrentContentAreas[i][j];
+
+                        if (j == 0)
+                        {
+                            dr[j] = i.ToString();
+                            continue;
+                        }
+                        else if (j > 2 && j <= 2 + scanColumnCount)
+                        {
+                            // sử dụng tesseract
+                            //number.SetImage(currentImg);
+                            //number.Recognize();
+
+                            //var res = number.GetUTF8Text()
+                            //    .Trim();
+                            //dr[j] = res;
+                            // sử dụng gg API
+                            currentImg.ToBitmap().Save("./temp.jpg", ImageFormat.Jpeg);
+
+                            var image = await Google.Cloud.Vision.V1.Image.FromFileAsync("./temp.jpg");
+                            var response = client.DetectText(image);
+
+                            var resultCollection = new List<string>();
+                            foreach (var annotation in response)
+                            {
+                                if (annotation.Description != null)
+                                {
+                                    annotation.Description = Regex.Replace(annotation.Description,
+                                        @"[^0-9.,]", "", RegexOptions.Multiline)
+                                    .Trim()
+                                    .Trim('.')
+                                    .Trim(',');
+                                    resultCollection.Add(annotation.Description);
+                                }
+                            }
+                            dr[j] = GetBestScores(resultCollection);
+                        }
+                        else if (j == 1 || j == 2)
+                        {
+                            // sử dụng tesseract
+                            orc.SetImage(currentImg);
+                            orc.Recognize();
+
+                            var res = orc.GetUTF8Text()
+                                .Trim();
+
+                            // Xử lý dành cho mã học viên
+                            if (j == 1)
+                            {
+                                dr[j] = ProcessStudentCode(res);
+                            }
+                            else if (j == 2)
+                            {
+                                dr[j] = ProcessStudentName(res);
+                            }
+                            else
+                            {
+                                dr[j] = res;
+                            }
+                        }
+                    }
+                    dt.Rows.Add(dr);
+                }
+                Invoke(new Action(() =>
+                {
+                    ResultData.DataSource = dt;
+                    loadingDialog.Close();
+                }));
+            }).Start();
+            loadingDialog.ShowDialog();
+        }
+
+        private string GetBestScores(List<string> resultCollection)
+        {
+            resultCollection = resultCollection
+                .Where(x => Regex.IsMatch(x.Trim(), @"^(\d[.,]\d)|\d$"))
+                .Select(x => x.Trim().Replace(",", "."))
+                .ToList();
+            return resultCollection.FirstOrDefault<string>() ?? "";
+        }
+
+        private object ProcessStudentName(string res)
+        {
+            return Regex
+                .Replace(res, @"[^a-z0-9A-Z ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]", "", RegexOptions.Multiline)
+                .Replace("|", "")
+                .Trim();
+        }
+
+        private object ProcessStudentCode(string res)
+        {
+            Match m = Regex.Match(res, @"\w{5,}", RegexOptions.CultureInvariant);
+            return m.Value;
         }
 
         private void CurrentPhoto_Click(object sender, EventArgs e)
@@ -469,10 +232,23 @@ MessageBoxButtons.OK, MessageBoxIcon.Information);
             {
                 CurrentImagePath = dlg.FileName;
                 OpenProcessCropImage();
-                var croppedImage = Pre.Processing(CurrentImagePath);
-                CurrentContentAreas = ExtractDataAreas.Processing(croppedImage);
-                CurrentPhoto.Image = croppedImage.ToBitmap();
             }
+        }
+
+        private void StartProcessCroppedImage(Bitmap bmp)
+        {
+            var loadingDialog = new LoadingForm();
+            new Thread(() =>
+            {
+                var croppedImage = Pre.Processing((Bitmap)bmp.Clone());
+                CurrentContentAreas = ExtractDataAreas.Processing(croppedImage);
+                Invoke(new Action(() =>
+                {
+                    CurrentPhoto.Image = croppedImage.ToBitmap();
+                    loadingDialog.Close();
+                }));
+            }).Start();
+            loadingDialog.ShowDialog();
         }
 
 
@@ -485,6 +261,7 @@ MessageBoxButtons.OK, MessageBoxIcon.Information);
             {
                 var croppedImage = cropImageForm.ProcessedBitmap;
                 CurrentPhoto.Image = croppedImage;
+                StartProcessCroppedImage(croppedImage);
             }
         }
 
@@ -501,19 +278,38 @@ MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                APIAuthorizePath.Text = dlg.FileName;
+                File.Delete(RuntimeController.GetAPIKeyFilePath());
+                File.Copy(dlg.FileName, RuntimeController.GetAPIKeyFilePath());
+                APIAuthorizeOK();
             }
+        }
+
+        private void APIAuthorizeOK()
+        {
+            APIAuthorizePath.Text = "Nhấp để thay đổi";
+            APIAuthorizePath.ReadOnly = true;
+            APIAuthorizePath.BackColor = Color.Green;
+
+            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", RuntimeController.GetAPIKeyFilePath());
+        }
+
+        private void APIAuthorizeFail()
+        {
+            APIAuthorizePath.Text = "Nhấp để thêm";
+            APIAuthorizePath.ReadOnly = true;
+            APIAuthorizePath.BackColor = Color.Red;
         }
 
 
         private void ExportExcel_Click(object sender, EventArgs e)
         {
-            if (ResultDetectedStrings == null || ResultDetectedStrings.Count <= 0)
+            if (ResultData.RowCount <= 0 && ResultData.ColumnCount <= 0)
             {
                 MessageBox.Show("Chưa có dữ liệu để xuất", "CHƯA CÓ DỮ LIỆU",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
             if (string.IsNullOrEmpty(NameOfNewExcel.Text))
             {
                 MessageBox.Show("Vui lòng đặt tên cho tệp Excel mới", "CHƯA ĐẶT TÊN",
@@ -527,21 +323,7 @@ MessageBoxButtons.OK, MessageBoxIcon.Information);
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            //        try
-            //        {
-            //            var resPath = ExportExcelProcessing();
-            //            var dlgRes = MessageBox.Show("Đã xuất xong, mở thư mục chứa kết quả?", "THÀNH CÔNG",
-            //                MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-            //            if (dlgRes == DialogResult.Yes)
-            //            {
-            //                Process.Start(resPath);
-            //            }
-            //        }
-            //        catch (Exception)
-            //        {
-            //            MessageBox.Show("Xuất Excel không thành công!", "XUẤT KHÔNG THÀNH CÔNG",
-            //MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //        }
+
             var resPath = ExportExcelProcessing();
             var dlgRes = MessageBox.Show($"Đã xuất xong tại đường dẫn [{resPath}], mở thư mục chứa kết quả?", "THÀNH CÔNG",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Information);
