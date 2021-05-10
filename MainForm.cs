@@ -167,7 +167,7 @@ namespace VisionHandwritingICR
                             }
                             catch (Exception e)
                             {
-                                
+
                             }
                         }
                         else if (j == 1 || j == 2)
@@ -266,7 +266,22 @@ namespace VisionHandwritingICR
                     }));
                     return;
                 }
-                CurrentContentAreas = ExtractDataAreas.Processing(croppedImage);
+                try
+                {
+                    CurrentContentAreas = ExtractDataAreas.Processing(croppedImage);
+                }
+                catch (Exception)
+                {
+                    Invoke(new Action(() =>
+                    {
+                        loadingDialog.Close();
+                        MessageBox.Show("Vui lòng làm phẳng lại phiếu, dùng thước vuốt thẳng và chụp lại phiếu với ánh sáng tốt, rõ nét hơn",
+                            "CHẤT LƯỢNG ẢNH KÉM",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                    }));
+                    return;
+                }
                 Invoke(new Action(() =>
                 {
                     CurrentPhoto.Image = croppedImage.ToBitmap();
