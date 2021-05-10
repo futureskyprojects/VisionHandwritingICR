@@ -27,8 +27,8 @@ namespace VisionHandwritingICR.Processing
             var step1BinaryImage = preProcess.ConvertToBinary(imagePath);
             var step2BinaryInvertImage = preProcess.ConvertToInvertBinary(step1BinaryImage);
             var step3BigestContours = preProcess.GetBigestContours(step2BinaryInvertImage);
-            var step4 = preProcess.PerspectiveTransform(step3BigestContours);
-            return ReProcessing(step4);
+            return preProcess.PerspectiveTransform(step3BigestContours);
+            //return ReProcessing(step4);
 
         }
 
@@ -39,8 +39,8 @@ namespace VisionHandwritingICR.Processing
             var step1BinaryImage = preProcess.ConvertToBinary(preProcess.RawImage);
             var step2BinaryInvertImage = preProcess.ConvertToInvertBinary(step1BinaryImage);
             var step3BigestContours = preProcess.GetBigestContours(step2BinaryInvertImage);
-            var step4 = preProcess.PerspectiveTransform(step3BigestContours);
-            return ReProcessing(step4);
+            return preProcess.PerspectiveTransform(step3BigestContours);
+            //return ReProcessing(step4);
 
         }
 
@@ -182,9 +182,21 @@ namespace VisionHandwritingICR.Processing
 
             // Nếu không có bất cứ viền nào lớn hơn 60% diện tích ảnh thì bỏ qua
             // Hoặc 4 điểm chạm viền thì bỏ qua
-            if ((CvInvoke.BoundingRectangle(biggestContourPoins).Width < invertBinary.Width * 0.6 ||
-                CvInvoke.BoundingRectangle(biggestContourPoins).Contains(new Point(0, 0))) &&
-                CvInvoke.BoundingRectangle(sendcondLargestPoint).Width < invertBinary.Width * 0.6)
+            try
+            {
+                var rectaz = CvInvoke.BoundingRectangle(biggestContourPoins);
+                if (biggestContourPoins == null || rectaz == null)
+                {
+                    return null;
+                }
+                if ((rectaz.Width < invertBinary.Width * 0.6 ||
+                rectaz.Contains(new Point(0, 0))) &&
+                rectaz.Width < invertBinary.Width * 0.6)
+                {
+                    return null;
+                }
+            }
+            catch (Exception)
             {
                 return null;
             }
@@ -200,7 +212,7 @@ namespace VisionHandwritingICR.Processing
                     rawImageClone.Draw(rect, new Bgr(255, 0, 0), 5);
                 }
                 // Lưu ảnh viền bao đầy đủ
-                rawImageClone.ToBitmap().CurrentSave("__#4_full_contours.jpg");
+                rawImageClone.ToBitmap().CurrentSave("__#3_full_contours.jpg");
             }
 
             // Lấy khung viền lớn nhất
@@ -218,7 +230,7 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu ảnh của khung viền đầy đủ
-                croppedImage.ToBitmap().CurrentSave("_#4_bigest_contours_in_binaInv.jpg");
+                croppedImage.ToBitmap().CurrentSave("__#4_bigest_contours_in_binaInv.jpg");
                 // Lưu ảnh có màu đã được cắt
                 RawImage.ROI = bigestRect;
                 RawImage = RawImage.Copy();
@@ -237,20 +249,75 @@ namespace VisionHandwritingICR.Processing
         {
             // Lọc phong sương, làm mịn phi tuyến tính, bảo toàn cạnh và giảm nhiễu cho hình ảnh
             var bfImg = binaryInvertImage.CopyBlank();
-            CvInvoke.BilateralFilter(binaryInvertImage, bfImg, 5, 75, 75);
+            CvInvoke.BilateralFilter(binaryInvertImage, bfImg, 1, 60, 100);
             if (IsDebug)
             {
                 // Lưu ảnh của lọc nhiễu phong sương
                 bfImg.ToBitmap().CurrentSave("__#6_BilateralFilter.jpg");
             }
 
+            #region For vertical line
+            var verKernel = CvInvoke.GetStructuringElement(ElementShape.Rectangle, new Size(1, 50), new Point(-1, -1));
+            var kernel = CvInvoke.GetStructuringElement(ElementShape.Rectangle, new Size(2, 2), new Point(-1, -1));
+
+            var verticalLine = binaryInvertImage.CopyBlank();
+            CvInvoke.Erode(binaryInvertImage, verticalLine, verKernel, new Point(-1, -1), 1, BorderType.Default, new MCvScalar(255, 0, 0));
+            CvInvoke.Dilate(verticalLine, verticalLine, verKernel, new Point(-1, -1), 1, BorderType.Default, new MCvScalar(255, 0, 0));
+
+            if (IsDebug)
+            {
+                // Lưu kết quả debug
+                verticalLine.ToBitmap().CurrentSave("__#7_Vertical_line.jpg");
+            }
+            #endregion
+
+            #region For horizontal line
+            var horKernel = CvInvoke.GetStructuringElement(ElementShape.Rectangle, new Size(50, 1), new Point(-1, -1));
+
+            var horizontalLine = binaryInvertImage.CopyBlank();
+            CvInvoke.Erode(binaryInvertImage, horizontalLine, horKernel, new Point(-1, -1), 1, BorderType.Default, new MCvScalar(255, 0, 0));
+            CvInvoke.Dilate(horizontalLine, horizontalLine, horKernel, new Point(-1, -1), 1, BorderType.Default, new MCvScalar(255, 0, 0));
+
+            if (IsDebug)
+            {
+                // Lưu kết quả debug
+                horizontalLine.ToBitmap().CurrentSave("__#8_Horizontai_line.jpg");
+            }
+            #endregion
+
+            #region Combine horizontal and vertical
+            var combinedLines = binaryInvertImage.CopyBlank();
+            CvInvoke.AddWeighted(verticalLine, 0.5, horizontalLine, 0.5, 0.0, combinedLines);
+            if (IsDebug)
+            {
+                // Lưu kết quả debug
+                combinedLines.ToBitmap().CurrentSave("__#9_Combine_line.jpg");
+            }
+            #endregion
+
+            var combinedLineBitwise = combinedLines.CopyBlank();
+            CvInvoke.Erode(combinedLines.Not(), combinedLineBitwise, kernel, new Point(-1, -1), 2, BorderType.Default, new MCvScalar(200, 0, 0));
+            if (IsDebug)
+            {
+                // Lưu kết quả debug
+                combinedLines.ToBitmap().CurrentSave("__#10_Combine_line_bitwise.jpg");
+            }
+
+            var threshold = combinedLineBitwise.CopyBlank();
+            CvInvoke.Threshold(combinedLineBitwise, threshold, 60, 255, ThresholdType.Binary | ThresholdType.Otsu);
+            if (IsDebug)
+            {
+                // Lưu kết quả debug
+                threshold.ToBitmap().CurrentSave("__#11_Combine_line_bitwise_threshold.jpg");
+            }
+
             // Trích xuất góc
             var corners = new Mat();
-            CvInvoke.CornerHarris(bfImg, corners, 2);
+            CvInvoke.CornerHarris(threshold, corners, 3);
             CvInvoke.Normalize(corners, corners, 255, 0, NormType.MinMax);
 
             // Tạo ảnh đem để có thể xem góc xuất hiện
-            var blackImage = bfImg.CopyBlank().Convert<Bgr, byte>();
+            var blackImage = threshold.CopyBlank().Convert<Bgr, byte>();
             blackImage.SetZero();
 
             // Chuyển thành ma trận giá trị để lọc
@@ -264,34 +331,17 @@ namespace VisionHandwritingICR.Processing
             Point bottomLeftCornor = new Point(-1, -1);
             Point bottomRightCornor = new Point(-1, -1);
 
+            var okPoints = new List<Point>();
+
             // Lặp tìm giá trị góc
             for (int i = 0; i < matrix.Rows; i++)
             {
                 for (int j = 0; j < matrix.Cols; j++)
                 {
-                    if (matrix[i, j] > 50 && (i == 0 || j == 0 || i == matrix.Rows - 1 || j == matrix.Cols - 1))
+                    // && (i == 0 || j == 0 || i == matrix.Rows - 1 || j == matrix.Cols - 1)
+                    if (matrix[i, j] > 100)
                     {
-                        // Tìm góc trên bên trái
-                        if (j < matrix.Cols / 2 && i < matrix.Rows / 2 && (topLeftCornor.X == -1 || (topLeftCornor.X >= j && topLeftCornor.Y >= i)))
-                        {
-                            topLeftCornor = new Point(j, i);
-                        }
-                        // Tìm góc trên bên phải
-                        if (j > matrix.Cols / 2 && i < matrix.Rows / 2 && (topRightCorner.X == -1 || (topRightCorner.X <= j && topRightCorner.Y >= i)))
-                        {
-                            topRightCorner = new Point(j, i);
-                        }
-                        // Tìm góc dưới bên trái
-                        if (j < matrix.Cols / 2 && i > matrix.Rows / 2 && (bottomLeftCornor.X == -1 || (bottomLeftCornor.X >= j && bottomLeftCornor.Y <= i)))
-                        {
-                            bottomLeftCornor = new Point(j, i);
-                        }
-                        // Tìm góc dưới phên phải
-                        if (j > matrix.Cols / 2 && i > matrix.Rows / 2 && (bottomRightCornor.X == -1 || (bottomRightCornor.X <= j && bottomRightCornor.Y <= i)))
-                        {
-                            bottomRightCornor = new Point(j, i);
-                        }
-                        //matchPoints.Add(new Point(j, i));
+                        okPoints.Add(new Point(j, i));
 
                         if (IsDebug)
                         {
@@ -302,6 +352,34 @@ namespace VisionHandwritingICR.Processing
                 }
             }
 
+            var seprate = 80;
+            // Khoanh tất cả các góc tìm được
+            CvInvoke.Rectangle(blackImage, new Rectangle(0, 0, seprate, seprate), new MCvScalar(0, 0, 255));
+
+            // Sắp xếp sơ bộ lại trật tự
+            topLeftCornor = okPoints
+                .Where(x => x.X < seprate && x.Y < seprate)
+                .OrderBy(x => x.X)
+                .ThenBy(x => x.Y).ToList()
+                .First();
+
+            topRightCorner = okPoints
+                .Where(x => x.X > matrix.Cols - seprate && x.Y < seprate)
+                .OrderBy(x => x.Y)
+                .ThenByDescending(x => x.X).ToList()
+                .First();
+
+            bottomLeftCornor = okPoints
+                .Where(x => x.X < seprate && x.Y > matrix.Rows - seprate)
+                .OrderByDescending(x => x.Y)
+                .ThenBy(x => x.X).ToList()
+                .First();
+
+            bottomRightCornor = okPoints
+                .Where(x => x.X > matrix.Cols - seprate && x.Y > matrix.Rows - seprate)
+                .OrderByDescending(x => x.Y)
+                .ThenByDescending(x => x.X).ToList()
+                .First();
             // Phần khớp trên
 
 
@@ -315,11 +393,13 @@ namespace VisionHandwritingICR.Processing
                 CvInvoke.Circle(blackImage, bottomRightCornor, 5, new MCvScalar(255, 255, 255), 5);
             }
 
+
+
             // Lưu ảnh danh sách góc
             if (IsDebug)
             {
                 // Lưu ảnh của trích xuất góc
-                blackImage.ToBitmap().CurrentSave("__#7_CornerHarris_all_corners.jpg");
+                blackImage.ToBitmap().CurrentSave("__#12_CornerHarris_all_corners.jpg");
             }
 
             // Điểm source
@@ -346,7 +426,7 @@ namespace VisionHandwritingICR.Processing
             if (IsDebug)
             {
                 // Lưu ảnh của trích xuất góc
-                RawImage.ToBitmap().CurrentSave("__#8_WarpPerspective.jpg");
+                RawImage.ToBitmap().CurrentSave("__#13_WarpPerspective.jpg");
             }
             RawImage.Draw(new Rectangle(new Point(0, 0), RawImage.Size), new Bgr(0, 0, 0), 2);
             return RawImage;

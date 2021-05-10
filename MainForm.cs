@@ -97,9 +97,6 @@ namespace VisionHandwritingICR
 
             ProcessingData();
 
-            InitSheetParams();
-
-            MessageBox.Show("Đã nhận diện xong", "THÀNH CÔNG", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void ProcessingData()
@@ -129,6 +126,8 @@ namespace VisionHandwritingICR
                     {
                         var currentImg = CurrentContentAreas[i][j];
 
+                        // Xử lý bao countours
+
                         if (j == 0)
                         {
                             dr[j] = i.ToString();
@@ -144,25 +143,32 @@ namespace VisionHandwritingICR
                             //    .Trim();
                             //dr[j] = res;
                             // sử dụng gg API
-                            currentImg.ToBitmap().Save("./temp.jpg", ImageFormat.Jpeg);
-
-                            var image = await Google.Cloud.Vision.V1.Image.FromFileAsync("./temp.jpg");
-                            var response = client.DetectText(image);
-
-                            var resultCollection = new List<string>();
-                            foreach (var annotation in response)
+                            try
                             {
-                                if (annotation.Description != null)
+                                currentImg.ToBitmap().Save("./temp.jpg", ImageFormat.Jpeg);
+
+                                var image = await Google.Cloud.Vision.V1.Image.FromFileAsync("./temp.jpg");
+                                var response = client.DetectText(image);
+
+                                var resultCollection = new List<string>();
+                                foreach (var annotation in response)
                                 {
-                                    annotation.Description = Regex.Replace(annotation.Description,
-                                        @"[^0-9.,]", "", RegexOptions.Multiline)
-                                    .Trim()
-                                    .Trim('.')
-                                    .Trim(',');
-                                    resultCollection.Add(annotation.Description);
+                                    if (annotation.Description != null)
+                                    {
+                                        annotation.Description = Regex.Replace(annotation.Description,
+                                            @"[^0-9.,]", "", RegexOptions.Multiline)
+                                        .Trim()
+                                        .Trim('.')
+                                        .Trim(',');
+                                        resultCollection.Add(annotation.Description);
+                                    }
                                 }
+                                dr[j] = GetBestScores(resultCollection);
                             }
-                            dr[j] = GetBestScores(resultCollection);
+                            catch (Exception e)
+                            {
+                                
+                            }
                         }
                         else if (j == 1 || j == 2)
                         {
@@ -194,6 +200,9 @@ namespace VisionHandwritingICR
                 {
                     ResultData.DataSource = dt;
                     loadingDialog.Close();
+                    InitSheetParams();
+
+                    MessageBox.Show("Đã nhận diện xong", "THÀNH CÔNG", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }));
             }).Start();
             loadingDialog.ShowDialog();
@@ -240,7 +249,23 @@ namespace VisionHandwritingICR
             var loadingDialog = new LoadingForm();
             new Thread(() =>
             {
-                var croppedImage = Pre.Processing((Bitmap)bmp.Clone());
+                Image<Bgr, byte> croppedImage = null;
+                try
+                {
+                    croppedImage = Pre.Processing((Bitmap)bmp.Clone());
+                }
+                catch (Exception)
+                {
+                    Invoke(new Action(() =>
+                    {
+                        loadingDialog.Close();
+                        MessageBox.Show("Không thể căn chỉnh ảnh, vui lòng sử dụng công cụ để cắt lại hoặc chọn một ảnh khác tuân thủ theo hướng dẫn",
+                            "XỬ LÝ KHÔNG ĐƯỢC",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                    }));
+                    return;
+                }
                 CurrentContentAreas = ExtractDataAreas.Processing(croppedImage);
                 Invoke(new Action(() =>
                 {
